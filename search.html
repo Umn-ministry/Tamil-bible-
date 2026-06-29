@@ -1,0 +1,121 @@
+06.29 10:25
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>வசன தேடல்</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#f5f5f5;
+margin:0;
+}
+
+header{
+background:#1565c0;
+padding:20px;
+color:white;
+}
+
+input{
+width:100%;
+padding:12px;
+font-size:18px;
+border:none;
+border-radius:8px;
+}
+
+.result{
+background:white;
+margin:12px;
+padding:15px;
+border-radius:10px;
+box-shadow:0 2px 5px rgba(0,0,0,.2);
+}
+
+.ref{
+color:#1565c0;
+font-weight:bold;
+margin-bottom:8px;
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h2> வசன தேடல்</h2>
+
+<input
+id="search"
+placeholder="தேடுங்கள்..."
+onkeyup="searchVerse()">
+
+</header>
+
+<div id="results"></div>
+
+<script src="books.js"></script>
+
+<script>
+
+async function searchVerse(){
+
+const word=document.getElementById("search").value.trim();
+
+if(word.length<2){
+
+document.getElementById("results").innerHTML="";
+
+return;
+
+}
+
+let html="";
+
+for(const file of BOOK_FILES){
+
+const data=await fetch("books/"+file+".json").then(r=>r.json());
+
+for(let c=0;c<data.Chapter.length;c++){
+
+const verses=data.Chapter[c].Verse;
+
+for(let v=0;v<verses.length;v++){
+
+if(verses[v].Verse.includes(word)){
+
+html+=`
+<div class="result">
+
+<div class="ref">
+
+${file} ${c+1}:${v+1}
+
+</div>
+
+${verses[v].Verse}
+
+</div>
+`;
+
+}
+
+}
+
+}
+
+}
+
+document.getElementById("results").innerHTML=html||"<p style='padding:15px'>முடிவுகள் இல்லை.</p>";
+
+}
+
+</script>
+
+</body>
+</html>
