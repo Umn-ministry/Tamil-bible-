@@ -1,0 +1,215 @@
+06.29 10:19
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>வேதாகமம்</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f5f5f5;
+}
+
+header{
+background:#1565c0;
+color:#fff;
+padding:15px;
+text-align:center;
+position:sticky;
+top:0;
+}
+
+#verses{
+padding:15px;
+}
+
+.verse{
+background:#fff;
+margin-bottom:12px;
+padding:15px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,.15);
+line-height:1.8;
+font-size:18px;
+}
+
+.no{
+font-weight:bold;
+color:#1565c0;
+margin-right:8px;
+}
+
+.bottom{
+display:flex;
+justify-content:space-between;
+margin-top:12px;
+}
+
+button{
+padding:8px 15px;
+border:none;
+border-radius:8px;
+background:#1565c0;
+color:#fff;
+cursor:pointer;
+}
+
+button:hover{
+background:#0d47a1;
+}
+
+.nav{
+display:flex;
+justify-content:space-between;
+padding:20px;
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h2 id="title"></h2>
+
+</header>
+
+<div id="verses"></div>
+
+<div class="nav">
+
+<button onclick="prevChapter()">
+◀ முந்தைய அதிகாரம்
+</button>
+
+<button onclick="nextChapter()">
+அடுத்த அதிகாரம் ▶
+</button>
+
+</div>
+
+<script>
+
+const params=new URLSearchParams(location.search);
+
+const file=params.get("book");
+
+let chapter=parseInt(params.get("chapter"));
+
+document.getElementById("title").innerHTML=file+" "+chapter;
+
+fetch("books/"+file+".json")
+
+.then(r=>r.json())
+
+.then(book=>{
+
+const verses=book.Chapter[chapter-1].Verse;
+
+let html="";
+
+verses.forEach(v=>{
+
+html+=`
+
+<div class="verse">
+
+<span class="no">
+
+${parseInt(v.Verseid)+1}
+
+</span>
+
+${v.Verse}
+
+<div class="bottom">
+
+<button onclick="copyVerse(\`${v.Verse}\`)">
+
+Copy
+
+</button>
+
+<button onclick="shareVerse(\`${v.Verse}\`)">
+
+Share
+
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById("verses").innerHTML=html;
+
+window.totalChapters=book.Chapter.length;
+
+});
+
+function copyVerse(text){
+
+navigator.clipboard.writeText(text);
+
+alert("வசனம் Copy செய்யப்பட்டது");
+
+}
+
+function shareVerse(text){
+
+if(navigator.share){
+
+navigator.share({
+
+title:"தமிழ் வேதாகமம்",
+
+text:text
+
+});
+
+}else{
+
+copyVerse(text);
+
+}
+
+}
+
+function prevChapter(){
+
+if(chapter>1){
+
+location.href="chapter.html?book="+file+"&chapter="+(chapter-1);
+
+}
+
+}
+
+function nextChapter(){
+
+if(chapter<window.totalChapters){
+
+location.href="chapter.html?book="+file+"&chapter="+(chapter+1);
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
+
+
